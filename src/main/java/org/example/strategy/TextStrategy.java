@@ -3,7 +3,10 @@ package org.example.strategy;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
-public interface Strategy {
+public class TextStrategy implements Strategy{
 
-    SendMessage getResponse(Update update);
+    @Override
+    public SendMessage getResponse(Update update) {
+        return null;
+    }
 }
