@@ -1,5 +1,6 @@
 package org.example.strategy;
 
+import org.example.CommonMessages;
 import org.example.PizzaStore;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -8,18 +9,18 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-public class TextStrategy implements Strategy{
+public class TextStrategy implements Strategy {
 
     @Override
     public SendMessage getResponse(Update update) {
         String chatId = update.getMessage().getChatId().toString();
 
         SendMessage response = new SendMessage();
-        String defaultResponse = "I'm sorry, but I do not understand message. Please tap /start to start over if you are lost";
 
         response.setChatId(chatId);
-        response.setText(defaultResponse);
+        response.setText(CommonMessages.COMMON_RESPONSE);
 
         String textUpdate = update.getMessage().getText().trim();
 
@@ -32,7 +33,7 @@ public class TextStrategy implements Strategy{
             //Then we create the buttons: row
             List<InlineKeyboardButton> buttonsRow = new ArrayList<>();
 
-            for (String pizza: PizzaStore.PIZZA_TYPE_LIST) {
+            for (String pizza : PizzaStore.PIZZA_TYPE_LIST) {
                 InlineKeyboardButton button = new InlineKeyboardButton();
                 button.setText(pizza);
                 button.setCallbackData(pizza);

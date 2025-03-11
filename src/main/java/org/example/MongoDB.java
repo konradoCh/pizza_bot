@@ -12,7 +12,6 @@ import org.bson.BsonInt64;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.example.enums.OrderState;
-import org.example.enums.Size;
 
 import static com.mongodb.client.model.Filters.eq;
 
