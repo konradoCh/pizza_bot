@@ -10,10 +10,11 @@ public class Main {
             TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
             Responder responder = new Responder(Bot.BOT_TOKEN);
             telegramBotsApi.registerBot(responder);
+
+            MongoDB.connectToDatabase();
+
         } catch (TelegramApiException telegramApiException) {
             telegramApiException.printStackTrace();
         }
-
-        MongoDB.connectToDatabase();
     }
 }

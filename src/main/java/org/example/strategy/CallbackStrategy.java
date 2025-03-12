@@ -3,6 +3,7 @@ package org.example.strategy;
 import org.example.CommonMessages;
 import org.example.MongoDB;
 import org.example.PizzaStore;
+import org.example.enums.OrderState;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -56,6 +57,41 @@ public class CallbackStrategy implements Strategy {
 
         }
 
-        return null;
+        if (PizzaStore.PIZZA_SIZE_MAP.containsKey(callBackResponse)) {
+            MongoDB.updateField(MongoDB.PIZZA_SIZE, callBackResponse, chatId);
+
+            response.setText("Please select the drink you'd like to have");
+
+            //First create the keyboard
+            List<List<InlineKeyboardButton>> keyboard = new ArrayList<>(); // tworzenie przycisków
+
+            //Then we create the buttons: row
+            List<InlineKeyboardButton> buttonsRow = new ArrayList<>();
+
+            for (Map.Entry<String, Double> set : PizzaStore.DRINKS_MAP.entrySet()) {
+                InlineKeyboardButton button = new InlineKeyboardButton();
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append(set.getKey()).append(": $").append(set.getValue());
+                button.setText(stringBuilder.toString());
+                button.setCallbackData(set.getKey().toString());
+                buttonsRow.add(button);
+            }
+
+            keyboard.add(buttonsRow);
+
+            InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+            inlineKeyboardMarkup.setKeyboard(keyboard);
+
+            response.setReplyMarkup(inlineKeyboardMarkup);
+        }
+
+        if (PizzaStore.DRINKS_MAP.containsKey(callBackResponse)) {
+            MongoDB.updateField(MongoDB.DRINK, callBackResponse, chatId);
+            MongoDB.updateField(MongoDB.ORDER_STATE, OrderState.ADDRESS.toString(), chatId);
+
+            response.setText("Please type address to which the delivery og the pizza will go to");
+        }
+
+        return response;
     }
 }

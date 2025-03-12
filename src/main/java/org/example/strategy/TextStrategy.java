@@ -1,7 +1,10 @@
 package org.example.strategy;
 
+import org.example.Calculator;
 import org.example.CommonMessages;
+import org.example.MongoDB;
 import org.example.PizzaStore;
+import org.example.enums.OrderState;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -9,10 +12,8 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class TextStrategy implements Strategy {
-
     @Override
     public SendMessage getResponse(Update update) {
         String chatId = update.getMessage().getChatId().toString();
@@ -49,6 +50,18 @@ public class TextStrategy implements Strategy {
             response.setReplyMarkup(inlineKeyboardMarkup);
         }
 
+        if (MongoDB.getFieldValue(MongoDB.ORDER_STATE, chatId).equalsIgnoreCase(OrderState.ADDRESS.toString())) {
+            MongoDB.updateField(MongoDB.ADDRESS, textUpdate, chatId);
+
+            MongoDB.updateField(MongoDB.ORDER_STATE, OrderState.PAYMENT.toString(), chatId);
+
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("The final total price to be paid is goint to be:\n\n $").append(Calculator.getFinalPrice(chatId)).append("\n\nto get back to main menu type /start");
+            response.setText(stringBuilder.toString());
+
+        }
+
         return response;
     }
+
 }

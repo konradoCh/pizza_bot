@@ -14,6 +14,7 @@ import org.bson.conversions.Bson;
 import org.example.enums.OrderState;
 
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Projections.*;
 
 
 public class MongoDB {
@@ -26,6 +27,7 @@ public class MongoDB {
     public final static String PIZZA_TYPE = "PIZZA_TYPE";
     public final static String PIZZA_SIZE = "PIZZA_SIZE";
     public final static String DRINK = "DRINK";
+    public final static String ADDRESS = "ADDRESS";
 
     public static void connectToDatabase() {
         String uri = "mongodb://localhost:27017";
@@ -53,8 +55,9 @@ public class MongoDB {
                         .append("_id", userId)
                         .append(ORDER_STATE, OrderState.SELECTION)
                         .append(PIZZA_TYPE, "")
-                        .append(PIZZA_SIZE, Size.Small.toString())
+                        .append(PIZZA_SIZE, "")
                         .append(DRINK, "")
+                        .append(ADDRESS, "")
                 );
                 System.out.println(result.getInsertedId());
             }
@@ -84,5 +87,23 @@ public class MongoDB {
                 new Document("$set", new Document(field, newValue)));
 
         return result.wasAcknowledged() && result.getModifiedCount() == 1;
+    }
+
+    public static String getFieldValue(String fieldName, String userChatId) {
+        MongoDatabase mongoDatabase = mongoClient.getDatabase(TELEGRAM_DATABASE);
+        MongoCollection<Document> customerCollection = mongoDatabase.getCollection(CUSTOMERS_COLLECTION);
+
+        Document result = customerCollection.find(eq("_id", userChatId))
+                .projection(fields(include(fieldName), excludeId())).first();
+
+        return result.getString(fieldName);
+    }
+
+    public static Document getCustomerAttributes(String userChatId) {
+        MongoDatabase mongoDatabase = mongoClient.getDatabase(TELEGRAM_DATABASE);
+        MongoCollection<Document> customerCollection = mongoDatabase.getCollection(CUSTOMERS_COLLECTION);
+        Document result = customerCollection.find(eq("_id", userChatId)).first();
+
+        return result;
     }
 }
